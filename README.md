@@ -93,6 +93,11 @@ kubectl apply -f k8s/
 # 2. Monitor deployment
 kubectl get pods -n quote-generator-app
 ```
+### Access Application
+
+- **Web UI**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
 
 ### Scale FastAPI Service
 
