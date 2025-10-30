@@ -28,24 +28,10 @@ The application fulfills the requirements for a Kubernetes-based microservice de
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│            Kubernetes Cluster / Docker Network              │
-│                                                             │
-│  ┌──────────────┐    ┌─────────────┐    ┌──────────────┐    │
-│  │  FastAPI     │    │ llama.cpp   │    │ PostgreSQL   │    │
-│  │  (quote-api) │───→│  (inference)│    │  (storage)   │    │
-│  │              │    │             │    │              │    │
-│  │ Replicas: 2+ │    │ Port: 8080  │    │ Port: 5432   │    │
-│  │ Port: 8000   │    └─────────────┘    │ PersistVol:  │    │
-│  │              │                       │ 5Gi          │    │
-│  └──────────────┘                       └──────────────┘    │
-│       ↑                                                     │
-└───────┼─────────────────────────────────────────────────────┘
-        │ HTTP LoadBalancer / Browser
-        │ localhost:8000
-    User / Client
-```
+<p align="center">
+  <img src="architecture.png" alt="Application Demo">
+</p>
+
 
 ## Setup & Installation
 
