@@ -2,6 +2,10 @@
 
 A cloud-native microservices application that generates unique inspirational quotes using a local LLM ([Llama 3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)) inference via [llama.cpp](https://github.com/ggml-org/llama.cpp). The application comprises multiple services including quote generation, database storage, and a user interface, enabling users to view, download, and manage their quote history. This project is part of the PA2577 Applied Cloud Computing and Big Data course, covering "Cloud Provisioning and Deployment" and "The Business Case for Cloud Computing."
 
+<p align="center">
+  <img src="demo.gif" alt="Application Demo">
+</p>
+
 ## Overview
 
 This application demonstrates a production-ready microservice architecture with three independent services:
