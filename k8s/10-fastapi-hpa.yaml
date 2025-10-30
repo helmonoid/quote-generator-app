@@ -1,0 +1,49 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: quote-api-hpa
+  namespace: quote-generator-app
+  labels:
+    app: quote-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: quote-api
+  minReplicas: 2          # Minimum pods: 2 (cost control)
+  maxReplicas: 10         # Maximum pods: 10 (prevent runaway costs)
+  metrics:
+  # Scale based on CPU usage
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70  # If avg CPU > 70%, add pods
+  # Scale based on Memory usage
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80  # If avg memory > 80%, add pods
+  behavior:
+    # How fast to scale up (aggressive for responsiveness)
+    scaleUp:
+      stabilizationWindowSeconds: 0      # Don't wait, scale immediately
+      policies:
+      - type: Percent
+        value: 100                        # Add 100% more pods (double)
+        periodSeconds: 15                 # Every 15 seconds
+      - type: Pods
+        value: 2                          # OR add 2 pods
+        periodSeconds: 15
+      selectPolicy: Max                   # Choose whichever adds more pods
+    # How fast to scale down (conservative to prevent flapping)
+    scaleDown:
+      stabilizationWindowSeconds: 300    # Wait 5 minutes before scaling down
+      policies:
+      - type: Percent
+        value: 50                         # Remove 50% of pods
+        periodSeconds: 60                 # Every 60 seconds
+      selectPolicy: Min                   # Choose whichever removes fewer pods

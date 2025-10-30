@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: quote-generator-app
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS quotes (
+        id SERIAL PRIMARY KEY,
+        quote TEXT NOT NULL,
+        generated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        theme VARCHAR(100),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_generated_at ON quotes(generated_at DESC);

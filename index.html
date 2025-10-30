@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inspirational Quote Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-button:hover {
+            color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .generator-section {
+            text-align: center;
+        }
+        #quote {
+            font-size: 24px;
+            color: #333;
+            line-height: 1.6;
+            margin: 40px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .quote-meta {
+            font-size: 14px;
+            color: #999;
+            margin-top: 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        .history-section {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .quote-item {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .quote-item-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .quote-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+        .quote-item-theme {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .delete-btn {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .status-message {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/docs">API Docs</a>
+        <a href="/health">Health</a>
+    </div>
+    <div class="container">
+        <h1>✨ Inspirational Quote Generator</h1>
+        <p class="subtitle">Generate unique quotes powered by AI and explore previously created quotes</p>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('generator')">Generate Quote</button>
+            <button class="tab-button" onclick="switchTab('history')">Quote History</button>
+        </div>
+
+        <!-- Generator Tab -->
+        <div id="generator" class="tab-content active">
+            <div class="generator-section">
+                <div id="status-generator" class="status-message"></div>
+                <div id="quote">Click the button to generate a quote</div>
+                <div class="quote-meta">
+                    <span id="quote-date"></span>
+                    <span id="quote-theme"></span>
+                </div>
+                <div class="button-group">
+                    <button onclick="getQuote()" id="btn">Generate Quote</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div id="status-history" class="status-message"></div>
+            <div id="history-container" class="history-section">
+                <div class="empty-state">Loading quotes...</div>
+            </div>
+            <div class="export-buttons">
+                <button class="secondary" onclick="exportQuotes('csv')">📥 Download as CSV</button>
+                <button class="secondary" onclick="exportQuotes('json')">📥 Download as JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load history when switching to history tab
+            if (tabName === 'history') {
+                loadQuoteHistory();
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type, tabName = 'generator') {
+            const statusEl = document.getElementById(`status-${tabName}`);
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            setTimeout(() => {
+                statusEl.className = 'status-message';
+            }, 4000);
+        }
+
+        // Generate new quote
+        async function getQuote() {
+            const btn = document.getElementById('btn');
+            const quoteEl = document.getElementById('quote');
+            const dateEl = document.getElementById('quote-date');
+            const themeEl = document.getElementById('quote-theme');
+
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            quoteEl.textContent = '...';
+            dateEl.textContent = '';
+            themeEl.textContent = '';
+
+            try {
+                const response = await fetch('/quote');
+                if (!response.ok) throw new Error('Failed to generate quote');
+
+                const data = await response.json();
+                quoteEl.textContent = data.quote;
+
+                const date = new Date(data.date);
+                dateEl.textContent = date.toLocaleString();
+
+                if (data.theme) {
+                    themeEl.innerHTML = `<span class="quote-item-theme">${data.theme}</span>`;
+                }
+
+                showStatus('Quote generated and saved!', 'success', 'generator');
+            } catch (error) {
+                quoteEl.textContent = 'Error generating quote. Please try again.';
+                showStatus('Failed to generate quote', 'error', 'generator');
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Generate Quote';
+        }
+
+        // Load quote history
+        async function loadQuoteHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '<div class="empty-state">Loading quotes...</div>';
+
+            try {
+                const response = await fetch('/quotes');
+                if (!response.ok) throw new Error('Failed to load quotes');
+
+                const quotes = await response.json();
+
+                if (quotes.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No quotes yet. Generate some quotes to see them here!</div>';
+                    return;
+                }
+
+                let html = '';
+                quotes.forEach(quote => {
+                    const date = new Date(quote.generated_at);
+                    html += `
+                        <div class="quote-item">
+                            <div class="quote-item-text">"${quote.quote}"</div>
+                            <div class="quote-item-meta">
+                                <div>
+                                    <span class="quote-item-theme">${quote.theme}</span>
+                                    <span style="margin-left: 10px;">${date.toLocaleString()}</span>
+                                </div>
+                                <button class="delete-btn" onclick="deleteQuote(${quote.id})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<div class="empty-state">Error loading quotes. Please try again.</div>';
+                showStatus('Failed to load quotes', 'error', 'history');
+            }
+        }
+
+        // Delete a quote
+        async function deleteQuote(quoteId) {
+            if (!confirm('Are you sure you want to delete this quote?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/quotes/${quoteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete quote');
+
+                showStatus('Quote deleted successfully', 'success', 'history');
+                loadQuoteHistory();
+            } catch (error) {
+                showStatus('Failed to delete quote', 'error', 'history');
+            }
+        }
+
+        // Export quotes
+        async function exportQuotes(format) {
+            try {
+                const endpoint = format === 'csv' ? '/quotes/export/csv' : '/quotes/export/json';
+                const response = await fetch(endpoint);
+
+                if (!response.ok) throw new Error('Failed to export quotes');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `quotes.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showStatus(`Quotes exported as ${format.toUpperCase()}`, 'success', 'history');
+            } catch (error) {
+                showStatus(`Failed to export quotes`, 'error', 'history');
+            }
+        }
+
+        // Load quote on page load (optional)
+        window.addEventListener('load', () => {
+            // Can auto-load a quote on page load if desired
+            // getQuote();
+        });
+    </script>
+</body>
+</html>
